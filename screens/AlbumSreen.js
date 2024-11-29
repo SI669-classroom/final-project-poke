@@ -1,5 +1,5 @@
 import { useSelector } from "react-redux";
-import { StyleSheet, View, FlatList, TouchableOpacity, Text } from "react-native";
+import { StyleSheet, View, FlatList, TouchableOpacity, Text, Image } from "react-native";
 import { Button, Overlay } from '@rneui/themed';
 import { useFonts } from 'expo-font';
 import { useState, useEffect } from 'react';
@@ -7,12 +7,15 @@ import ListPicItem from '../components/ListPicItem'
 
 function AlbumScreen({ navigation, route }) {
   const imageList = useSelector((state) => state.userSlice.imageList);
+  const selectedPic = useSelector((state) => state.userSlice.selectedImg);
   const {showSort} = route.params || {};
+  const {showPic} = route.params || {};
   const [sortVisible, setSortVisible] = useState(false);
   const [byName, setByName] = useState(true);
   const [byNameDirect, setByNameDirect] = useState('↓');
   const [byDate, setByDate] = useState(false);
   const [byDateDirect, setByDateDirect] = useState('↓');
+  const [picVisible, setPicVisible] = useState(false);
 
 
   let [fontsLoaded] = useFonts({
@@ -27,6 +30,10 @@ function AlbumScreen({ navigation, route }) {
     if (showSort !== undefined && !sortVisible) {setSortVisible(true);}
   }, [showSort]);
 
+  useEffect(() => {
+    if (showPic !== undefined && !picVisible) {setPicVisible(true);}
+  }, [showPic]);
+
   const sortByName = () => {
     if (byName) {setByNameDirect(current => (current==='↓'? '↑':'↓'));}
     setByName(true);
@@ -37,6 +44,12 @@ function AlbumScreen({ navigation, route }) {
     if (byDate) {setByDateDirect(current => (current==='↓'? '↑':'↓'));}
     setByDate(true);
     setByName(false);
+  }
+
+  const timestamp2date = (t) => {
+    const date = new Date(t);
+    // Format as MM/DD/YYYY
+    return `${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear()}`; 
   }
 
   return(
@@ -83,7 +96,23 @@ function AlbumScreen({ navigation, route }) {
             by added date {byDateDirect}
           </Text>
         </TouchableOpacity>
+      </Overlay>
 
+      <Overlay
+        isVisible={picVisible} 
+        overlayStyle={{backgroundColor:'white', width:280, height:320, alignItems:'center'}}
+        onBackdropPress={() => setPicVisible(false)}
+      >
+        <Image
+            style={styles.picture}
+            source={{uri: `${selectedPic.path}`}}
+          />
+        <Text style={{fontSize:20, width:255, paddingHorizontal:'2%', paddingTop:'1%', fontFamily:'PixelifySans'}}>
+          {selectedPic.imageName}
+        </Text>
+        <Text style={{fontSize:15, width:255, paddingHorizontal:'2%',fontFamily:'PixelifySans'}}>
+          Date: {timestamp2date(selectedPic.date)}
+        </Text>
       </Overlay>
      
     </View>
@@ -103,6 +132,11 @@ const styles = StyleSheet.create({
       paddingLeft: '5%',
       paddingTop: '5%'
     },
+    picture: {
+      width: 255,
+      height: 255,
+      resizeMode: 'contain'
+    }
 });
 
 export default AlbumScreen;

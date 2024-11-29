@@ -45,7 +45,8 @@
     "react-native-web": "~0.19.13",
     "react-redux": "^8.0.5",
     "rneui": "^1.0.0-stable.0",
-    "expo-network": "~7.0.2"
+    "expo-network": "~7.0.2",
+    "expo-sharing": "~13.0.0"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2"

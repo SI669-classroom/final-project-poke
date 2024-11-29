@@ -1,9 +1,11 @@
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { useDispatch } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
+import * as Sharing from 'expo-sharing';
 import { useFonts } from 'expo-font';
+import { selectImg, deletePicture } from "../data/userSlice";
 
 function ListPicItem(props) {
-
+    const currentUser = useSelector(state => state.userSlice.currentUser);
     const dispatch = useDispatch();
     const { pic, navigation } = props;
 
@@ -14,10 +16,31 @@ function ListPicItem(props) {
     if (!fontsLoaded) {
       return null;
     }
-  
+ 
     // delete the item using the async thunk
     const deleteItem = (item) => {
-      // dispatch(deleteContactThunk(item.key));
+      const pic = {
+        date: item.date,
+        path: item.path,
+        user: currentUser.key
+      }
+      dispatch(deletePicture(pic));
+    };
+
+    // share a picture 
+    const shareImage = async (imgUri) => {
+      try {
+        const result = await Sharing.shareAsync(imgUri);
+        if (result) {
+          if (result.action === Sharing.sharedAction) {
+            console.log('Image shared successfully!');
+          } else if (result.action === Sharing.dismissedAction) {
+            console.log('Share dialog dismissed.');
+          }
+        }
+      } catch (error) {
+        console.error('Error sharing image:', error);
+      }
     };
   
     return (
@@ -25,10 +48,9 @@ function ListPicItem(props) {
         <TouchableOpacity 
           style={styles.li1}
           onPress={()=>{
-            // dispatch(selectContact(item.key));
-            // navigation.navigate('singleContact', { 
-            //   item: item 
-            // });
+            // select this picture 
+            dispatch(selectImg(pic));
+            navigation.navigate('Album', {showPic: Math.random()});
           }}  
         >
           <Text style={styles.listItemText}>{pic.imageName}</Text>
@@ -46,7 +68,7 @@ function ListPicItem(props) {
         <TouchableOpacity 
           style={styles.li2}
           onPress={()=>{
-            deleteItem(item);
+            shareImage(pic.path);
           }}  
         >
           <Text style={styles.listItemOptionText}>Share</Text>
@@ -55,7 +77,7 @@ function ListPicItem(props) {
         <TouchableOpacity 
           style={styles.li2}
           onPress={()=>{
-            deleteItem(item);
+            deleteItem(pic);
           }}  
         >
           <Text style={styles.listItemOptionText}>Delete</Text>

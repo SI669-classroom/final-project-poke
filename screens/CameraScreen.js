@@ -6,9 +6,7 @@ import { manipulateAsync, SaveFormat } from 'expo-image-manipulator';
 import { useState, useRef } from 'react';
 import ViewShot from 'react-native-view-shot';
 import { useFonts } from 'expo-font';
-
 import { addPicture } from "../data/userSlice";
-
 
 function CameraScreen({ navigation }) {
   const dispatch = useDispatch();
@@ -79,6 +77,9 @@ function CameraScreen({ navigation }) {
       const id = currentUser.key;
       const input = {uri:pic, picName:photoName, user:id}
       dispatch(addPicture(input));
+      setSaveVisible(false); 
+      setPhotoName('');
+      setGrayscaleArray([]);
     }
   }
 
@@ -191,14 +192,16 @@ function CameraScreen({ navigation }) {
 
   return (
     <View style={styles.container}>
-      <View style={styles.gridPreview}>
+      <View style={[styles.gridPreview, grayscaleArray.length > 0 ? {backgroundColor: 'black'}:{}]}>
         <View>
-          <TouchableOpacity onPress={() => setSaveVisible(true)}>
-            <Text style={{fontSize:15,color:'white',backgroundColor:'black',textAlign:'center',fontFamily:'PixelifySans'}}>⮕Save this picture</Text>
+          <TouchableOpacity onPress={() => {if(grayscaleArray.length > 0){setSaveVisible(true)}}}>
+            <Text 
+              style={{fontSize:15,color:'white',backgroundColor:'black',textAlign:'center',fontFamily:'PixelifySans'}}
+            >
+              ⮕Save this picture
+            </Text>
           </TouchableOpacity>
         </View>
-        {/* {photo ? <Image source={{ uri: photo }} style={{ width: 320, height: 250 }} 
-    resizeMode="contain" /> : <Text>No photo to process</Text>} */}
         {grayscaleArray.length > 0 ? displayGrayscaleGrid(grayscaleArray): 
         <Text style={{textAlign:'center', marginTop:'40%',fontFamily:'PixelifySans'}}>No photo to process</Text>}
       </View>

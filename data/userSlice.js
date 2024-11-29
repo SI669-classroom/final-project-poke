@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import { initializeApp, getApps } from 'firebase/app';
 import {setDoc, getDocs, addDoc, doc, getFirestore, 
-  collection, onSnapshot, getDoc, deleteDoc} from 'firebase/firestore';
+  collection, onSnapshot, getDoc, deleteDoc, query, where} from 'firebase/firestore';
 import {getStorage, ref, uploadBytes, getDownloadURL, deleteObject} from 'firebase/storage';
 import { firebaseConfig } from '../Secrets';
 
@@ -93,7 +93,8 @@ export const setUser = createAsyncThunk(
 export const addPicture = createAsyncThunk(
   'app/addPicture',
   async (pic) => {
-    const currentPhotoRef = ref(storage, `images/${pic.picName}.png`);
+    const currentTime = Date.now();
+    const currentPhotoRef = ref(storage, `images/${currentTime}.png`);
     try {
       // fetch the image object (blob) from the local filesystem
       const response = await fetch(pic.uri);
@@ -111,7 +112,7 @@ export const addPicture = createAsyncThunk(
       const img = {
         imageName: pic.picName,
         path: downloadURL,
-        date: Date.now(),
+        date: currentTime,
       }
       await addDoc(imageCollectionRef, img);
       return img;
@@ -123,27 +124,26 @@ export const addPicture = createAsyncThunk(
 
 export const deletePicture = createAsyncThunk(
   'app/deletePicture',
-  async (picName, picPath, user) => {
-    const currentPhotoRef = ref(storage, `images/${picNmae}.png`);
+  async (pic) => {
     try {
       // Reference to the image in Firebase Storage
-      const storageRef = ref(storage, `images/${picName}.png`);
+      const storageRef = ref(storage, `images/${pic.date}.png`);
       // Delete the image from Firebase Storage
       await deleteObject(storageRef);
 
       // Reference to the user's 'image' subcollection
-      const userDocRef = doc(db, 'users', user.key);
+      const userDocRef = doc(db, 'users', pic.user);
       const imageCollectionRef = collection(userDocRef, 'image');
       // Query to find the document in the 'image' subcollection
-      const q = query(imageCollectionRef, where('path', '==', picPath));
+      const q = query(imageCollectionRef, where('path', '==', pic.path));
       const querySnapshot = await getDocs(q);
       // Delete the document(s) in the Firestore subcollection
       querySnapshot.forEach(async (docSnap) => {
         await deleteDoc(docSnap.ref);
       });
-      return picPath;
+      return pic.path;
     } catch (e) {
-      console.log("Error saving picture:", e);
+      console.log("Error deleting picture:", e);
     }
   }
 );
@@ -152,24 +152,21 @@ export const userSlice = createSlice({
   name: 'users',
   initialState: {
     currentUser: {},
-    picture:{},
     imageList: [],
+    selectedImg: {},
   },
-  // reducers is a mandatory argument even if all of our reducers
-  // are in extraReducers
   reducers: {
-    addPicture: (state, action) => {
-      state.picture = action.payload;
+    selectImg: (state, action) => {
+      state.selectedImg = action.payload;
     },
   },
   extraReducers: (builder) => {
     builder.addCase(setUser.fulfilled, (state, action) => {
       state.currentUser = action.payload;
     });
-
     builder.addCase(addPicture.fulfilled, (state, action) => {
       const pic = action.payload;
-      state.imageList = {...state.imageList, pic}
+      state.imageList = [...state.imageList, pic]
     });
     builder.addCase(deletePicture.fulfilled, (state, action) => {
       const picPath = action.payload;
@@ -181,5 +178,6 @@ export const userSlice = createSlice({
   }
 })
 
-export { fetchUserImagesThunk, addUser, setUser, addPicture };
+export const { selectImg } = userSlice.actions;
+export { fetchUserImagesThunk, addUser, setUser, addPicture, deletePicture };
 export default userSlice.reducer
