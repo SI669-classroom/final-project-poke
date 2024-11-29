@@ -59,7 +59,9 @@ function ListPicItem(props) {
         <TouchableOpacity 
           style={styles.li2}
           onPress={()=>{
-            
+            // select this picture 
+            dispatch(selectImg(pic));
+            navigation.navigate('Album', {editPic: Math.random()});
           }}  
         >
           <Text style={styles.listItemOptionText}>Edit</Text>

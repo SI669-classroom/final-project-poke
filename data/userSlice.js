@@ -1,7 +1,8 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import { initializeApp, getApps } from 'firebase/app';
 import {setDoc, getDocs, addDoc, doc, getFirestore, 
-  collection, onSnapshot, getDoc, deleteDoc, query, where} from 'firebase/firestore';
+  collection, onSnapshot, getDoc, deleteDoc, updateDoc,
+  query, where} from 'firebase/firestore';
 import {getStorage, ref, uploadBytes, getDownloadURL, deleteObject} from 'firebase/storage';
 import { firebaseConfig } from '../Secrets';
 
@@ -137,13 +138,38 @@ export const deletePicture = createAsyncThunk(
       // Query to find the document in the 'image' subcollection
       const q = query(imageCollectionRef, where('path', '==', pic.path));
       const querySnapshot = await getDocs(q);
-      // Delete the document(s) in the Firestore subcollection
+      // Delete the document in the Firestore subcollection
       querySnapshot.forEach(async (docSnap) => {
         await deleteDoc(docSnap.ref);
       });
       return pic.path;
     } catch (e) {
       console.log("Error deleting picture:", e);
+    }
+  }
+);
+
+export const updatePicture = createAsyncThunk(
+  'app/updatePicture',
+  async (pic) => {
+    try {
+      const updatedPic = {
+      date: pic.date,
+      imageName: pic.imageName,
+      path: pic.path
+      }
+      // Reference to the user's 'image' subcollection
+      const userDocRef = doc(db, 'users', pic.user);
+      const imageCollectionRef = collection(userDocRef, 'image');
+      // Query to find the document in the 'image' subcollection
+      const q = query(imageCollectionRef, where('path', '==', pic.path));
+      const querySnapshot = await getDocs(q);
+      querySnapshot.forEach(async (docSnap) => {
+        await updateDoc(docSnap.ref, updatedPic);
+      });
+      return updatedPic;
+    } catch (e) {
+      console.log("Error updating picture:", e);
     }
   }
 );
@@ -172,6 +198,12 @@ export const userSlice = createSlice({
       const picPath = action.payload;
       state.imageList = state.imageList.filter((image) => image.path !== picPath);
     });
+    builder.addCase(updatePicture.fulfilled, (state, action) => {
+      const pic = action.payload;
+      state.imageList = state.imageList.map(
+        item => (item.path === pic.path ? {...item, imageName:pic.imageName} : item)
+      );
+    });
     builder.addCase(fetchUserImagesThunk.fulfilled, (state, action) => {
       state.imageList = action.payload;
     })
@@ -179,5 +211,5 @@ export const userSlice = createSlice({
 })
 
 export const { selectImg } = userSlice.actions;
-export { fetchUserImagesThunk, addUser, setUser, addPicture, deletePicture };
+export { fetchUserImagesThunk, addUser, setUser, addPicture, deletePicture, updatePicture };
 export default userSlice.reducer

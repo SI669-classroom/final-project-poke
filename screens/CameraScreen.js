@@ -196,7 +196,8 @@ function CameraScreen({ navigation }) {
         <View>
           <TouchableOpacity onPress={() => {if(grayscaleArray.length > 0){setSaveVisible(true)}}}>
             <Text 
-              style={{fontSize:15,color:'white',backgroundColor:'black',textAlign:'center',fontFamily:'PixelifySans'}}
+              style={[{fontSize:15,color:'white',backgroundColor:'black',textAlign:'center',fontFamily:'PixelifySans'}, 
+                grayscaleArray.length > 0 ? {backgroundColor:'red'}:{}]}
             >
               ⮕Save this picture
             </Text>
@@ -243,8 +244,8 @@ function CameraScreen({ navigation }) {
           />
           <Button
             onPress={captureAndProcessPhoto}
-            title="Take photo!"
-            color='black'
+            title="Take a photo!"
+            color='red'
             titleStyle={{fontFamily: 'PixelifySans'}}
           />
         </View>
@@ -359,9 +360,7 @@ function CameraScreen({ navigation }) {
             titleStyle={{fontFamily: 'PixelifySans'}}
           />
         </View>
-        
       </Overlay>
-      {/* <Button title="Save Grid as Image" onPress={saveGridAsImage} /> */}
     </View>
   );
 }
