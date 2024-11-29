@@ -6,11 +6,19 @@ import { useDispatch } from 'react-redux';
 
 import { signUp, signIn, subscribeToAuthChanges, getAuthUser } from '../AuthManager';
 import {addUser, setUser} from "../data/userSlice";
+import { useFonts } from 'expo-font';
 
 function SigninBox({navigation}) {
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  let [fontsLoaded] = useFonts({
+    'PixelifySans': require('../assets/fonts/PixelifySans-SemiBold.ttf'),
+  });
+
+  if (!fontsLoaded) {
+    return null;
+  }
 
   const dispatch = useDispatch();
 
@@ -223,7 +231,8 @@ const styles = StyleSheet.create({
   loginHeaderText: {
     fontSize: 20,
     color: 'black',
-    paddingBottom: '5%'
+    paddingBottom: '5%',
+    fontFamily: 'PixelifySans'
   },
   loginRow: {
     flexDirection: 'row',
@@ -239,7 +248,8 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end'
   },
   loginLabelText: {
-    fontSize: 18
+    fontSize: 18,
+    fontFamily: 'PixelifySans'
   },
   loginInputContainer: {
     flex: 0.5,
@@ -253,7 +263,8 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 6,
     fontSize: 18,
-    padding: '2%'
+    padding: '2%',
+    fontFamily: 'PixelifySans'
   },
   modeSwitchContainer:{
     flex: 0.2,

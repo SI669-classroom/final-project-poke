@@ -7,12 +7,21 @@ import HomeScreen from './screens/HomeScreen';
 import LoginScreen from './screens/LoginScreen';
 import CameraScreen from './screens/CameraScreen';
 import AlbumSreen from './screens/AlbumSreen';
+import { useFonts } from 'expo-font';
+import { TouchableOpacity, Text } from 'react-native';
 
 const store = configureStore({
   reducer: {userSlice}
 });
 
 function App() {
+  let [fontsLoaded] = useFonts({
+    'PixelifySans': require('./assets/fonts/PixelifySans-Bold.ttf'),
+  });
+
+  if (!fontsLoaded) {
+    return null;
+  }
   const Stack = createNativeStackNavigator();
 
   return (
@@ -22,27 +31,48 @@ function App() {
           <Stack.Screen name='Login' component={LoginScreen} options={{ headerShown: false }}/>
           <Stack.Screen name='Home' component={HomeScreen} options={{ headerShown: false }}/>
           <Stack.Screen name='Camera' component={CameraScreen} 
-            screenOptions={{
-              headerShown: true,
+            options={({ navigation }) => ({
+              headerTitleStyle: {
+                fontFamily: 'PixelifySans', 
+                fontSize: 25,
+                color: 'black',
+              },
               headerLeft: () => (
                 <TouchableOpacity onPress={() => {
                   navigation.navigate('Home'); 
                 }}>
-                  <Text>Home</Text>
+                  <Text style={{color:'black',fontSize:18,fontFamily: 'PixelifySans'}}>Home</Text>
                 </TouchableOpacity>
               ),
+            })}
+            screenOptions={{
+              headerShown: true,
             }}
           />
           <Stack.Screen name='Album' component={AlbumSreen} 
-            screenOptions={{ 
-              headerShown: true,
+            options={({ navigation }) =>({
+              headerTitleStyle: {
+                fontFamily: 'PixelifySans', 
+                fontSize: 25,
+                color: 'black',
+              },
               headerLeft: () => (
                 <TouchableOpacity onPress={() => {
                   navigation.navigate('Home'); 
                 }}>
-                  <Text>Home</Text>
+                  <Text style={{color:'black',fontSize:18,fontFamily: 'PixelifySans'}}>Home</Text>
                 </TouchableOpacity>
               ),
+              headerRight: () => (
+                <TouchableOpacity onPress={() => {
+                  navigation.navigate('Album', { showSort: Math.random()}); 
+                }}>
+                  <Text style={{color:'black',fontSize:18,fontFamily: 'PixelifySans'}}>Sort</Text>
+                </TouchableOpacity>
+              ),
+            })}
+            screenOptions={{ 
+              headerShown: true,
             }}
           />
         </Stack.Navigator>

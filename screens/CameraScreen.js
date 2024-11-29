@@ -1,13 +1,13 @@
-import { Button } from '@rneui/themed';
-import { Overlay } from '@rneui/themed';
+import { Button, Overlay } from '@rneui/themed';
 import { View, Text, StyleSheet, Alert, TouchableOpacity, FlatList, TextInput } from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
 import { useCameraPermissions, CameraView } from 'expo-camera';
 import { manipulateAsync, SaveFormat } from 'expo-image-manipulator';
-import { setPicture } from "../data/userSlice";
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef } from 'react';
 import ViewShot from 'react-native-view-shot';
-import * as FileSystem from 'expo-file-system';
+import { useFonts } from 'expo-font';
+
+import { addPicture } from "../data/userSlice";
 
 
 function CameraScreen({ navigation }) {
@@ -25,26 +25,34 @@ function CameraScreen({ navigation }) {
 
   const [zoom, setZoom] = useState(0);
   const [res, setRes] = useState(110);
-  const [whiteBalance, setWhiteBalance] = useState('auto');
+  const [flashmode, setFlashmode] = useState('off');
   const [photoName, setPhotoName] = useState('');
 
   const cameraRef = useRef(null);
   const viewShotRef = useRef(null);
   const cameraShotRef = useRef();
 
+  let [fontsLoaded] = useFonts({
+    'PixelifySans': require('../assets/fonts/PixelifySans-Regular.ttf'),
+  });
+
+  if (!fontsLoaded) {
+    return null;
+  }
+
   const schemes = {
     'default': null,
     'scheme1': [
-      { range: [0, 63], color: 'pink' },
-      { range: [64, 127], color: 'red' },
-      { range: [128, 191], color: 'gray' },
-      { range: [192, 255], color: 'black' },
+      { range: [0, 63], color: 'black' },
+      { range: [64, 127], color: 'gray' },
+      { range: [128, 191], color: 'red' },
+      { range: [192, 255], color: 'pink' },
     ],
     'scheme2': [
-      { range: [0, 63], color: 'green' },
-      { range: [64, 127], color: 'blue' },
-      { range: [128, 191], color: 'gray' },
-      { range: [192, 255], color: 'black' },
+      { range: [0, 63], color: 'black' },
+      { range: [64, 127], color: 'gray' },
+      { range: [128, 191], color: 'purple' },
+      { range: [192, 255], color: 'green' },
     ],
   };
 
@@ -62,13 +70,15 @@ function CameraScreen({ navigation }) {
   }
 
   // save pixel pictures
-  const savePic = async() => {
+  const savePic = async(photoName) => {
     if (viewShotRef.current) {
-      const p = await viewShotRef.current.capture({
-        quality: 0.1, 
-        base64: false, 
-        skipProcessing: true, 
+      const pic = await viewShotRef.current.capture({
+        quality: 1, 
+        base64: false
       });
+      const id = currentUser.key;
+      const input = {uri:pic, picName:photoName, user:id}
+      dispatch(addPicture(input));
     }
   }
 
@@ -159,7 +169,7 @@ function CameraScreen({ navigation }) {
   // render pixel picture
   const displayGrayscaleGrid = (array) => {
     return (
-      <View style={styles.gridContainer} ref={viewShotRef}>
+      <ViewShot style={styles.gridContainer} ref={viewShotRef}>
         {array.map((row, rowIndex) => (
           <View key={rowIndex} style={styles.gridRow}>
             {row.map((value, colIndex) => (
@@ -175,31 +185,32 @@ function CameraScreen({ navigation }) {
             ))}
           </View>
         ))}
-      </View>
+      </ViewShot>
     );
   };
-
-  // save picture
-  const picSave = () => {
-    
-  }
 
   return (
     <View style={styles.container}>
       <View style={styles.gridPreview}>
         <View>
           <TouchableOpacity onPress={() => setSaveVisible(true)}>
-            <Text style={{fontSize:15,color:'white',backgroundColor:'black'}}>Save this picture</Text>
+            <Text style={{fontSize:15,color:'white',backgroundColor:'black',textAlign:'center',fontFamily:'PixelifySans'}}>⮕Save this picture</Text>
           </TouchableOpacity>
         </View>
         {/* {photo ? <Image source={{ uri: photo }} style={{ width: 320, height: 250 }} 
     resizeMode="contain" /> : <Text>No photo to process</Text>} */}
-        {grayscaleArray.length > 0 ? displayGrayscaleGrid(grayscaleArray): <Text>No photo to process</Text>}
+        {grayscaleArray.length > 0 ? displayGrayscaleGrid(grayscaleArray): 
+        <Text style={{textAlign:'center', marginTop:'40%',fontFamily:'PixelifySans'}}>No photo to process</Text>}
       </View>
       
       <View style={styles.cameraContainer}>
         <View style={{paddingBottom:'5%'}}>
-          <Button title="Camera settings" color='black' onPress={() => setOverlayVisible(true)}/>
+          <Button 
+            title="Camera settings" 
+            color='black' 
+            titleStyle={{fontFamily: 'PixelifySans'}}
+            onPress={() => setOverlayVisible(true)}
+          />
         </View>
 
         <ViewShot style={styles.cameraFrame} ref={cameraShotRef} options={{ format: 'png', quality: 1.0 }}>
@@ -207,12 +218,14 @@ function CameraScreen({ navigation }) {
             style={styles.camera}
             facing={facing}
             zoom={zoom}
-            whiteBalance={whiteBalance}
+            flash={flashmode}
             ref={cameraRef}
           >
             <View>
               <TouchableOpacity onPress={toggleCameraFacing}>
-                <Text style={{fontSize:15,color:'white',backgroundColor:'black'}}>Flip Camera</Text>
+                <Text style={{fontSize:15,color:'white',backgroundColor:'black',textAlign:'center',fontFamily:'PixelifySans'}}>
+                ⮕Flip Camera
+                </Text>
               </TouchableOpacity>
             </View>
           </CameraView>
@@ -223,11 +236,13 @@ function CameraScreen({ navigation }) {
             onPress={()=>{navigation.navigate('Album')}}
             title="Album"
             color='black'
+            titleStyle={{fontFamily: 'PixelifySans'}}
           />
           <Button
             onPress={captureAndProcessPhoto}
             title="Take photo!"
             color='black'
+            titleStyle={{fontFamily: 'PixelifySans'}}
           />
         </View>
       </View>
@@ -239,9 +254,9 @@ function CameraScreen({ navigation }) {
         overlayStyle={{backgroundColor:'white', width:'80%', alignItems:'center'}}  
       >
         <View style={{width:'100%'}}>
-          <Text style={{fontSize:23, paddingBottom:'5%', marginHorizontal:'auto'}}>Camera settings</Text>
+          <Text style={{fontSize:23, paddingBottom:'5%', marginHorizontal:'auto',fontFamily:'PixelifySans'}}>Camera settings</Text>
           <View style={{flexDirection:'row'}}>
-            <Text>Zoom:  </Text>
+            <Text style={{fontFamily:'PixelifySans'}}>Zoom:  </Text>
             <FlatList
               horizontal
               data={[0.0, 0.01, 0.05, 0.1]}
@@ -250,7 +265,7 @@ function CameraScreen({ navigation }) {
                   <TouchableOpacity
                     onPress={() => setZoom(item)} 
                   >
-                    <Text style={{fontSize:15, width:'100%', paddingHorizontal:'5%'}}>
+                    <Text style={{fontSize:15, width:'100%', paddingHorizontal:'5%',fontFamily:'PixelifySans'}}>
                       {`x ${item}`}
                     </Text>
                   </TouchableOpacity>
@@ -259,7 +274,7 @@ function CameraScreen({ navigation }) {
             />
           </View>
           <View style={{flexDirection:'row'}}>
-            <Text>Size:  </Text>
+            <Text style={{fontFamily:'PixelifySans'}}>Size:  </Text>
             <FlatList
               horizontal
               data={[110,80,50,20]}
@@ -268,7 +283,7 @@ function CameraScreen({ navigation }) {
                   <TouchableOpacity
                     onPress={() => {setCellSize(item)}} 
                   >
-                    <Text style={{fontSize:15, width:'100%', paddingHorizontal:'1%'}}>
+                    <Text style={{fontSize:15, width:'100%', paddingHorizontal:'2%',fontFamily:'PixelifySans'}}>
                       {`${item}x${item}`}
                     </Text>
                   </TouchableOpacity>
@@ -277,7 +292,7 @@ function CameraScreen({ navigation }) {
             />
           </View>
           <View style={{flexDirection:'row'}}>
-            <Text>Colors:  </Text>
+            <Text style={{fontFamily:'PixelifySans'}}>Colors:  </Text>
             <FlatList
                 horizontal
                 data={['default', 'scheme1', 'scheme2']}
@@ -286,7 +301,7 @@ function CameraScreen({ navigation }) {
                     <TouchableOpacity
                       onPress={() => {setCurrentScheme(item)}} 
                     >
-                      <Text style={{fontSize:15, width:'100%', paddingHorizontal:'1%'}}>
+                      <Text style={{fontSize:15, width:'100%', paddingHorizontal:'2%',fontFamily:'PixelifySans'}}>
                         {item}
                       </Text>
                     </TouchableOpacity>
@@ -295,16 +310,16 @@ function CameraScreen({ navigation }) {
             />
           </View>
           <View style={{flexDirection:'row'}}>
-            <Text>White balance:  </Text>
+            <Text style={{fontFamily:'PixelifySans'}}>Flash mode:  </Text>
             <FlatList
                 horizontal
-                data={['auto', 'sunny', 'cloudy']}
+                data={['off', 'auto', 'on']}
                 renderItem={({item}) => {
                   return (
                     <TouchableOpacity
-                      onPress={() => {setWhiteBalance(item)}} 
+                      onPress={() => {setFlashmode(item)}} 
                     >
-                      <Text style={{fontSize:15, width:'100%', paddingHorizontal:'1%'}}>
+                      <Text style={{fontSize:15, width:'100%', paddingHorizontal:'2%',fontFamily:'PixelifySans'}}>
                         {item}
                       </Text>
                     </TouchableOpacity>
@@ -319,24 +334,26 @@ function CameraScreen({ navigation }) {
         overlayStyle={{backgroundColor:'white', width:'80%', alignItems:'center'}}  
       >
         <View style={{width:'100%'}}>
-        <Text style={{fontSize:23, paddingBottom:'5%', marginHorizontal:'auto'}}>Save</Text>
+        <Text style={{fontSize:23, paddingBottom:'5%', marginHorizontal:'auto',fontFamily:'PixelifySans'}}>Save</Text>
           <TextInput
-            style={styles.input}
+            style={[styles.input,{fontFamily:'PixelifySans'}]}
             placeholder="Enter picture name here..."
             onChangeText={newText => setPhotoName(newText)}
             value={photoName}
           >
           </TextInput>
           <Button
-            onPress={()=>{}}
+            onPress={()=>savePic(photoName)}
             title="Save"
             color='black'
             style={{paddingBottom:'3%'}}
+            titleStyle={{fontFamily: 'PixelifySans'}}
           />
           <Button
             onPress={() => {setSaveVisible(false); setPhotoName('')}}
             title="Cancel"
             color='black'
+            titleStyle={{fontFamily: 'PixelifySans'}}
           />
         </View>
         
@@ -352,6 +369,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor:'black'
   },
   navHeader: {
     flex: 0.05,

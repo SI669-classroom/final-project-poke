@@ -9,6 +9,7 @@
     "web": "expo start --web"
   },
   "dependencies": {
+    "@expo-google-fonts/inter": "^0.2.3",
     "@expo/metro-runtime": "~4.0.0",
     "@jimp/plugin-print": "^1.6.0",
     "@react-native-async-storage/async-storage": "1.23.1",
@@ -20,6 +21,7 @@
     "@reduxjs/toolkit": "^1.9.0",
     "expo": "^52.0.6",
     "expo-camera": "~16.0.7",
+    "expo-font": "~13.0.1",
     "expo-gl": "~15.0.2",
     "expo-gl-cpp": "^11.4.0",
     "expo-image": "~2.0.2",
@@ -42,7 +44,8 @@
     "react-native-view-shot": "4.0.2",
     "react-native-web": "~0.19.13",
     "react-redux": "^8.0.5",
-    "rneui": "^1.0.0-stable.0"
+    "rneui": "^1.0.0-stable.0",
+    "expo-network": "~7.0.2"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2"

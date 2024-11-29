@@ -1,30 +1,37 @@
 import { Button } from '@rneui/themed';
 import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
-import { useSelector, useDispatch  } from 'react-redux';
-import { signOut, getAuthUser } from '../AuthManager';
-import { setUser } from "../data/userSlice";
+import { useSelector, useDispatch } from 'react-redux';
+import { signOut } from '../AuthManager';
+import { useFonts } from 'expo-font';
+import { fetchUserImagesThunk } from "../data/userSlice";
 import { useEffect, useState } from 'react';
 
 function HomeScreen({navigation}) {
-  const currentUser = useSelector(state => state.userSlice.currentUser);
-  const picture = useSelector(state => state.userSlice.picture);
-  //const [currentUser, setCurrentUser] = useState({});
+  let currentUser = useSelector(state => state.userSlice.currentUser);
   const dispatch = useDispatch();
 
-  // useEffect(() => {
-  //   dispatch(setUser(getAuthUser()))
-  //   console.log(getAuthUser())
-  // }, []);
+  let [fontsLoaded] = useFonts({
+    'PixelifySans': require('../assets/fonts/PixelifySans-SemiBold.ttf'),
+  });
 
-  // console.log('in HomeScreen, currentUser:', currentUser);
+  if (!fontsLoaded) {
+    return null;
+  }
+
+  useEffect(() => {
+    if (currentUser.key) {
+      dispatch(fetchUserImagesThunk(currentUser.key));
+    }
+  }, [currentUser]);
+
   return (
     <View style={styles.container}>
-      <Text style={{padding:'5%', fontSize:34}}>
+      <Text style={{padding:'5%', fontSize:34, fontFamily:'PixelifySans'}}>
         GBCamera
       </Text>
 
-      <Text style={{padding:'5%'}}>
-        Hi, {currentUser?.displayName}! Welcome back
+      <Text style={{padding:'5%',fontFamily:'PixelifySans',fontSize:18}}>
+        Hi, {currentUser?.displayName}! Welcome back!
       </Text>
       <View style={styles.listContainer}>
         <TouchableOpacity
@@ -37,7 +44,7 @@ function HomeScreen({navigation}) {
             style={styles.logo}
             source={require('../assets/album.png')}
           />
-          <Text style={{fontSize:20}}>Album</Text>
+          <Text style={{fontSize:20,fontFamily:'PixelifySans'}}>Album</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -50,7 +57,7 @@ function HomeScreen({navigation}) {
             style={styles.logo}
             source={require('../assets/take.png')}
           />
-          <Text style={{fontSize:20}}>Take</Text>
+          <Text style={{fontSize:20,fontFamily:'PixelifySans'}}>Take</Text>
         </TouchableOpacity>
       </View>
 
@@ -61,6 +68,7 @@ function HomeScreen({navigation}) {
           onPress={async () => {
             signOut();
           }}
+          titleStyle={{fontFamily:'PixelifySans',color:'black'}}
         >
           {'Sign Out'}
       </Button>
@@ -80,7 +88,6 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
     width: '100%',
     padding: '5%',
-    //backgroundColor: 'green'
   },
   listContainer: {
     flex: 0.8,
