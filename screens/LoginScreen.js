@@ -3,7 +3,6 @@ import { useEffect, useState } from 'react';
 import { View, Text, TextInput, StyleSheet, Alert } from 'react-native';
 import { Button } from '@rneui/themed';
 import { useDispatch } from 'react-redux';
-
 import { signUp, signIn, subscribeToAuthChanges, getAuthUser } from '../AuthManager';
 import {addUser, setUser} from "../data/userSlice";
 import { useFonts } from 'expo-font';
@@ -59,6 +58,8 @@ function SigninBox({navigation}) {
         </View>
         <View style={styles.loginRow}>
           <Button
+            titleStyle={{fontFamily:'PixelifySans'}}
+            color='black'
             onPress={async () => {
               try {
                 const authUser = await signIn(email, password);
@@ -88,7 +89,6 @@ function SignupBox({navigation}) {
     <View style={{flex:1, alignItems:'center'}}>
       <Text style={[styles.loginHeaderText, {fontSize: 34}]}>GBCamera</Text>
       <View style={styles.loginContainer}>
-\
         <View style={styles.loginRow}>
           <View style={styles.loginLabelContainer}>
             <Text style={styles.loginLabelText}>Display Name: </Text>
@@ -138,6 +138,8 @@ function SignupBox({navigation}) {
         </View>
         <View style={styles.loginRow}>
           <Button
+            titleStyle={{fontFamily:'PixelifySans'}}
+            color="black"
             onPress={async () => {
               try {
                 try {
@@ -180,17 +182,17 @@ function LoginScreen({navigation}) {
         </View>
       <View styles={styles.modeSwitchContainer}>
         { loginMode ? 
-          <Text>New user? 
+          <Text style={{fontFamily:'PixelifySans', color:'white'}}>New user? 
             <Text 
               onPress={()=>{setLoginMode(!loginMode)}} 
-              style={{color: 'blue'}}> Sign up </Text> 
+              style={styles.signText}> Sign up </Text> 
             instead!
           </Text>
         :
-          <Text>Returning user? 
+          <Text style={{fontFamily: 'PixelifySans', color:'white'}}>Returning user? 
             <Text 
               onPress={()=>{setLoginMode(!loginMode)}} 
-              style={{color: 'blue'}}> Sign in </Text> 
+              style={styles.signText}> Sign in </Text> 
             instead!
           </Text>
         }
@@ -202,7 +204,7 @@ function LoginScreen({navigation}) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: 'black',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -210,7 +212,7 @@ const styles = StyleSheet.create({
     flex: 0.5,
     justifyContent: 'center',
     alignItems: 'center',
-    //backgroundColor: 'tan'
+    paddingBottom: '15%'
   },
   loginContainer: {
     flex: 1,
@@ -219,18 +221,18 @@ const styles = StyleSheet.create({
     width: '100%',
     paddingTop: '30%',
     paddingBottom: '10%',
-    //backgroundColor: 'lightblue'
   },
   loginHeader: {
+    color: 'white',
     width: '100%',
     padding: '3%',
     justifyContent: 'center',
     alignItems: 'center',
-    //backgroundColor: 'tan'
+    fontFamily: 'PixelifySans'
   },
   loginHeaderText: {
     fontSize: 20,
-    color: 'black',
+    color: 'white',
     paddingBottom: '5%',
     fontFamily: 'PixelifySans'
   },
@@ -239,7 +241,6 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start',
     alignItems: 'center',
     width: '100%',
-    //backgroundColor: 'pink',
     padding: '3%'
   },
   loginLabelContainer: {
@@ -249,6 +250,7 @@ const styles = StyleSheet.create({
   },
   loginLabelText: {
     fontSize: 18,
+    color: 'white',
     fontFamily: 'PixelifySans'
   },
   loginInputContainer: {
@@ -259,11 +261,12 @@ const styles = StyleSheet.create({
   },
   loginInputBox: {
     width: '100%',
-    borderColor: 'lightgray',
-    borderWidth: 1,
+    borderColor: 'gray',
+    borderWidth: 0.5,
     borderRadius: 6,
     fontSize: 18,
     padding: '2%',
+    backgroundColor: 'lightgray',
     fontFamily: 'PixelifySans'
   },
   modeSwitchContainer:{
@@ -271,7 +274,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     width: '100%',
-    backgroundColor: 'pink'
   },
   loginButtonRow: {
     width: '100%',
@@ -285,6 +287,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     width: '100%', 
   },
+  signText: {
+    color: 'red',
+    fontFamily: 'PixelifySans'
+  }
 });
 
 export default LoginScreen;

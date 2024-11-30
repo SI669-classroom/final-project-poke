@@ -26,11 +26,11 @@ function HomeScreen({navigation}) {
 
   return (
     <View style={styles.container}>
-      <Text style={{padding:'5%', fontSize:34, fontFamily:'PixelifySans'}}>
+      <Text style={{padding:'5%', fontSize:34, fontFamily:'PixelifySans',color:'white'}}>
         GBCamera
       </Text>
 
-      <Text style={{padding:'5%',fontFamily:'PixelifySans',fontSize:18}}>
+      <Text style={{padding:'5%',fontFamily:'PixelifySans',fontSize:18,color:'white'}}>
         Hi, {currentUser?.displayName}! Welcome back!
       </Text>
       <View style={styles.listContainer}>
@@ -42,9 +42,9 @@ function HomeScreen({navigation}) {
         >
           <Image
             style={styles.logo}
-            source={require('../assets/album.png')}
+            source={require('../assets/album_w.png')}
           />
-          <Text style={{fontSize:20,fontFamily:'PixelifySans'}}>Album</Text>
+          <Text style={{fontSize:20,fontFamily:'PixelifySans', color:'white'}}>Album</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -55,9 +55,9 @@ function HomeScreen({navigation}) {
         >
           <Image
             style={styles.logo}
-            source={require('../assets/take.png')}
+            source={require('../assets/take_w.png')}
           />
-          <Text style={{fontSize:20,fontFamily:'PixelifySans'}}>Take</Text>
+          <Text style={{fontSize:20,fontFamily:'PixelifySans', color: 'white'}}>Take</Text>
         </TouchableOpacity>
       </View>
 
@@ -68,7 +68,7 @@ function HomeScreen({navigation}) {
           onPress={async () => {
             signOut();
           }}
-          titleStyle={{fontFamily:'PixelifySans',color:'black'}}
+          titleStyle={{fontFamily:'PixelifySans',color:'white'}}
         >
           {'Sign Out'}
       </Button>
@@ -81,6 +81,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: 'black'
   },
   navHeader: {
     flex: 0.05,

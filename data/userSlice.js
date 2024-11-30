@@ -154,9 +154,9 @@ export const updatePicture = createAsyncThunk(
   async (pic) => {
     try {
       const updatedPic = {
-      date: pic.date,
-      imageName: pic.imageName,
-      path: pic.path
+        date: pic.date,
+        imageName: pic.imageName,
+        path: pic.path
       }
       // Reference to the user's 'image' subcollection
       const userDocRef = doc(db, 'users', pic.user);
@@ -185,6 +185,24 @@ export const userSlice = createSlice({
     selectImg: (state, action) => {
       state.selectedImg = action.payload;
     },
+    sortImageList: (state, action) => {
+      const {by, direction} = action.payload;
+      if (direction === '↑') {
+        // Ascending
+        state.imageList = state.imageList.slice().sort(
+          (a, b) => by==='name'
+          ? a.imageName.localeCompare(b.imageName)
+          :a.date - b.date
+        );
+      } else if (direction === '↓') {
+        // Descending
+        state.imageList = state.imageList.slice().sort(
+          (a, b) => by==='name'
+          ? b.imageName.localeCompare(a.imageName)
+          :b.date - a.date
+        );
+      }
+    }
   },
   extraReducers: (builder) => {
     builder.addCase(setUser.fulfilled, (state, action) => {
@@ -210,6 +228,6 @@ export const userSlice = createSlice({
   }
 })
 
-export const { selectImg } = userSlice.actions;
+export const { selectImg, sortImageList } = userSlice.actions;
 export { fetchUserImagesThunk, addUser, setUser, addPicture, deletePicture, updatePicture };
 export default userSlice.reducer

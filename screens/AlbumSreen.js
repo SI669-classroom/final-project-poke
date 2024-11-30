@@ -4,7 +4,7 @@ import { Button, Overlay } from '@rneui/themed';
 import { useFonts } from 'expo-font';
 import { useState, useEffect } from 'react';
 import ListPicItem from '../components/ListPicItem'
-import { updatePicture } from "../data/userSlice";
+import { updatePicture, sortImageList } from "../data/userSlice";
 
 function AlbumScreen({ navigation, route }) {
   const currentUser = useSelector(state => state.userSlice.currentUser);
@@ -51,12 +51,22 @@ function AlbumScreen({ navigation, route }) {
     if (byName) {setByNameDirect(current => (current==='↓'? '↑':'↓'));}
     setByName(true);
     setByDate(false);
+    const sortType = {
+      by:'name',
+      direction: byNameDirect
+    }
+    dispatch(sortImageList(sortType));
   }
 
   const sortByDate = () => {
     if (byDate) {setByDateDirect(current => (current==='↓'? '↑':'↓'));}
     setByDate(true);
     setByName(false);
+    const sortType = {
+      by:'date',
+      direction: byDateDirect
+    }
+    dispatch(sortImageList(sortType));
   }
 
   const timestamp2date = (t) => {
