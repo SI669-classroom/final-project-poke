@@ -34,14 +34,29 @@ function App() {
             options={({ navigation }) => ({
               headerTitleStyle: {
                 fontFamily: 'PixelifySans', 
-                fontSize: 25,
-                color: 'black',
+                fontSize: 28,
+                color: 'white',
               },
+              headerTitle: 'Take',
+              headerStyle: {
+                backgroundColor: 'black',
+              },
+              // contentStyle: {
+              //   borderTopColor: '#131313',
+              //   borderTopWidth: 3,
+              // },
               headerLeft: () => (
                 <TouchableOpacity onPress={() => {
                   navigation.navigate('Home'); 
                 }}>
-                  <Text style={{color:'black',fontSize:18,fontFamily: 'PixelifySans'}}>Home</Text>
+                  <Text style={{color:'white',fontSize:18,fontFamily: 'PixelifySans'}}>Home</Text>
+                </TouchableOpacity>
+              ),
+              headerRight: () => (
+                <TouchableOpacity onPress={() => {
+                  navigation.navigate('Camera', { showSettings: Math.random()}); 
+                }}>
+                  <Text style={{color:'white',fontSize:18,fontFamily: 'PixelifySans'}}>Settings</Text>
                 </TouchableOpacity>
               ),
             })}
@@ -53,21 +68,24 @@ function App() {
             options={({ navigation }) =>({
               headerTitleStyle: {
                 fontFamily: 'PixelifySans', 
-                fontSize: 25,
-                color: 'black',
+                fontSize: 28,
+                color: 'white',
+              },
+              headerStyle: {
+                backgroundColor: 'black',
               },
               headerLeft: () => (
                 <TouchableOpacity onPress={() => {
                   navigation.navigate('Home'); 
                 }}>
-                  <Text style={{color:'black',fontSize:18,fontFamily: 'PixelifySans'}}>Home</Text>
+                  <Text style={{color:'white',fontSize:18,fontFamily: 'PixelifySans'}}>Home</Text>
                 </TouchableOpacity>
               ),
               headerRight: () => (
                 <TouchableOpacity onPress={() => {
                   navigation.navigate('Album', { showSort: Math.random()}); 
                 }}>
-                  <Text style={{color:'black',fontSize:18,fontFamily: 'PixelifySans'}}>Sort</Text>
+                  <Text style={{color:'white',fontSize:18,fontFamily: 'PixelifySans'}}>Sort</Text>
                 </TouchableOpacity>
               ),
             })}

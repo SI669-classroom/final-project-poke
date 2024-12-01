@@ -68,10 +68,16 @@ function HomeScreen({navigation}) {
           onPress={async () => {
             signOut();
           }}
-          titleStyle={{fontFamily:'PixelifySans',color:'white'}}
+          titleStyle={{fontFamily:'PixelifySans',color:'white', paddingBottom:'3%'}}
         >
           {'Sign Out'}
       </Button>
+      <View style={{flexDirection:'row'}}>
+        <Text style={{color:'white'}}>© </Text>
+        <Text style={{fontFamily:'PixelifySans',color:'white'}}>
+          Xiaohao Yang 2024
+        </Text>
+      </View>
     </View>
   );
 }

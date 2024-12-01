@@ -1,4 +1,5 @@
 node_modules
 Secrets.js
+serverAPI.js
 package-lock.json
 .DS_Store

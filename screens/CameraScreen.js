@@ -3,12 +3,13 @@ import { View, Text, StyleSheet, Alert, TouchableOpacity, FlatList, TextInput } 
 import { useSelector, useDispatch } from 'react-redux';
 import { useCameraPermissions, CameraView } from 'expo-camera';
 import { manipulateAsync, SaveFormat } from 'expo-image-manipulator';
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import ViewShot from 'react-native-view-shot';
 import { useFonts } from 'expo-font';
 import { addPicture } from "../data/userSlice";
+import { server } from '../serverAPI';
 
-function CameraScreen({ navigation }) {
+function CameraScreen({ navigation, route }) {
   const dispatch = useDispatch();
   const currentUser = useSelector(state => state.userSlice.currentUser);
   const [permission, requestPermission] = useCameraPermissions();
@@ -18,8 +19,9 @@ function CameraScreen({ navigation }) {
   const [grayscaleArray, setGrayscaleArray] = useState([]);
   const [grid, setGrid] = useState({width: 2.5, height: 2.5})
   const [currentScheme, setCurrentScheme] = useState('default');
-  const [overlayVisible, setOverlayVisible] = useState(false);
   const [saveVisible, setSaveVisible] = useState(false);
+  const {showSettings} = route.params || {};
+  const [overlayVisible, setOverlayVisible] = useState(false);
 
   const [zoom, setZoom] = useState(0);
   const [res, setRes] = useState(110);
@@ -37,6 +39,12 @@ function CameraScreen({ navigation }) {
   if (!fontsLoaded) {
     return null;
   }
+
+  // show picture edit panel
+  useEffect(() => {
+    if (showSettings !== undefined && !overlayVisible) {setOverlayVisible(true);}
+  }, [showSettings]);
+
 
   const schemes = {
     'default': null,
@@ -134,8 +142,11 @@ function CameraScreen({ navigation }) {
         type: 'image/png', 
         name: 'photo.png',
       });
-  
-      const response = await fetch('http://192.168.12.151:5000/process-image', {
+      
+      // The local server ip address should be modified depending on the actual address
+      const local = 'http://192.168.12.151:5000/process-image';
+      // send and get data from backend deployed on the Render live Server
+      const response = await fetch(server, {
         method: 'POST',
         body: formData,
       });
@@ -199,23 +210,26 @@ function CameraScreen({ navigation }) {
               style={[{fontSize:15,color:'white',backgroundColor:'black',textAlign:'center',fontFamily:'PixelifySans'}, 
                 grayscaleArray.length > 0 ? {backgroundColor:'red'}:{}]}
             >
-              ⮕Save this picture
+              {grayscaleArray.length > 0? "↓Save this picture" : "↓No picture to save"}
             </Text>
           </TouchableOpacity>
         </View>
         {grayscaleArray.length > 0 ? displayGrayscaleGrid(grayscaleArray): 
-        <Text style={{textAlign:'center', marginTop:'40%',fontFamily:'PixelifySans'}}>No photo to process</Text>}
+        <View>
+          <Text style={{textAlign:'center', marginTop:'36%',fontFamily:'PixelifySans'}}>No photo to process</Text>
+          <Text style={{textAlign:'center',fontFamily:'PixelifySans',fontSize:33}}>Take one!</Text>
+        </View>}
       </View>
       
       <View style={styles.cameraContainer}>
-        <View style={{paddingBottom:'5%'}}>
+        {/* <View style={{paddingBottom:'5%'}}>
           <Button 
             title="Camera settings" 
             color='black' 
             titleStyle={{fontFamily: 'PixelifySans'}}
             onPress={() => setOverlayVisible(true)}
           />
-        </View>
+        </View> */}
 
         <ViewShot style={styles.cameraFrame} ref={cameraShotRef} options={{ format: 'png', quality: 1.0 }}>
           <CameraView 
@@ -228,7 +242,7 @@ function CameraScreen({ navigation }) {
             <View>
               <TouchableOpacity onPress={toggleCameraFacing}>
                 <Text style={{fontSize:15,color:'white',backgroundColor:'black',textAlign:'center',fontFamily:'PixelifySans'}}>
-                ⮕Flip Camera
+                ↓Flip Camera
                 </Text>
               </TouchableOpacity>
             </View>
@@ -258,9 +272,9 @@ function CameraScreen({ navigation }) {
         overlayStyle={{backgroundColor:'white', width:'80%', alignItems:'center'}}  
       >
         <View style={{width:'100%'}}>
-          <Text style={{fontSize:23, paddingBottom:'5%', marginHorizontal:'auto',fontFamily:'PixelifySans'}}>Camera settings</Text>
-          <View style={{flexDirection:'row'}}>
-            <Text style={{fontFamily:'PixelifySans'}}>Zoom:  </Text>
+          <Text style={{fontSize:24, paddingBottom:'5%', marginHorizontal:'auto',fontFamily:'PixelifySans'}}>Camera settings</Text>
+          <View style={styles.settingLayout}>
+            <Text style={styles.settingOption}> Zoom </Text>
             <FlatList
               horizontal
               data={[0.0, 0.01, 0.05, 0.1]}
@@ -269,7 +283,7 @@ function CameraScreen({ navigation }) {
                   <TouchableOpacity
                     onPress={() => setZoom(item)} 
                   >
-                    <Text style={{fontSize:15, width:'100%', paddingHorizontal:'5%',fontFamily:'PixelifySans'}}>
+                    <Text style={styles.optionText}>
                       {`x ${item}`}
                     </Text>
                   </TouchableOpacity>
@@ -277,8 +291,8 @@ function CameraScreen({ navigation }) {
               }}
             />
           </View>
-          <View style={{flexDirection:'row'}}>
-            <Text style={{fontFamily:'PixelifySans'}}>Size:  </Text>
+          <View style={styles.settingLayout}>
+            <Text style={styles.settingOption}> Size </Text>
             <FlatList
               horizontal
               data={[110,80,50,20]}
@@ -287,7 +301,7 @@ function CameraScreen({ navigation }) {
                   <TouchableOpacity
                     onPress={() => {setCellSize(item)}} 
                   >
-                    <Text style={{fontSize:15, width:'100%', paddingHorizontal:'2%',fontFamily:'PixelifySans'}}>
+                    <Text style={styles.optionText}>
                       {`${item}x${item}`}
                     </Text>
                   </TouchableOpacity>
@@ -295,8 +309,8 @@ function CameraScreen({ navigation }) {
               }}
             />
           </View>
-          <View style={{flexDirection:'row'}}>
-            <Text style={{fontFamily:'PixelifySans'}}>Colors:  </Text>
+          <View style={styles.settingLayout}>
+            <Text style={styles.settingOption}> Colors </Text>
             <FlatList
                 horizontal
                 data={['default', 'scheme1', 'scheme2']}
@@ -305,7 +319,7 @@ function CameraScreen({ navigation }) {
                     <TouchableOpacity
                       onPress={() => {setCurrentScheme(item)}} 
                     >
-                      <Text style={{fontSize:15, width:'100%', paddingHorizontal:'2%',fontFamily:'PixelifySans'}}>
+                      <Text style={styles.optionText}>
                         {item}
                       </Text>
                     </TouchableOpacity>
@@ -313,9 +327,10 @@ function CameraScreen({ navigation }) {
                 }}
             />
           </View>
-          <View style={{flexDirection:'row'}}>
-            <Text style={{fontFamily:'PixelifySans'}}>Flash mode:  </Text>
+          <View style={styles.settingLayout}>
+            <Text style={styles.settingOption}> Flash mode </Text>
             <FlatList
+                style={{flex:0.7}}
                 horizontal
                 data={['off', 'auto', 'on']}
                 renderItem={({item}) => {
@@ -323,7 +338,7 @@ function CameraScreen({ navigation }) {
                     <TouchableOpacity
                       onPress={() => {setFlashmode(item)}} 
                     >
-                      <Text style={{fontSize:15, width:'100%', paddingHorizontal:'2%',fontFamily:'PixelifySans'}}>
+                      <Text style={styles.optionText}>
                         {item}
                       </Text>
                     </TouchableOpacity>
@@ -365,7 +380,6 @@ function CameraScreen({ navigation }) {
   );
 }
 
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -387,7 +401,8 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   cameraFrame: {
-    flex: 0.8,
+    flex: 0.75,
+    //flex: 0.7,
     height: '100%',
     width: '70%',
   },
@@ -415,6 +430,28 @@ const styles = StyleSheet.create({
     padding: 10,
     marginBottom: 10,
   },
+  settingOption: {
+    fontFamily:'PixelifySans',
+    color: 'white', 
+    backgroundColor:'black', 
+    fontSize:15, 
+    borderRadius:5,
+    marginRight: '2%'
+  },
+  settingLayout: {
+    flexDirection:'row', 
+    width: '100%',
+    alignItems:'center',
+    paddingBottom: '1%'
+  },
+  optionText: {
+    fontSize:14, 
+    width:'100%', 
+    paddingHorizontal:'3%',
+    fontFamily:'PixelifySans',
+    backgroundColor:'lightgray',
+    borderRadius: 5
+  }
 });
 
 export default CameraScreen;

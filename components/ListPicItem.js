@@ -46,44 +46,47 @@ function ListPicItem(props) {
     return (
       <View style={styles.listItemContainer}>
         <TouchableOpacity 
-          style={styles.li1}
-          onPress={()=>{
-            // select this picture 
-            dispatch(selectImg(pic));
-            navigation.navigate('Album', {showPic: Math.random()});
-          }}  
+            style={styles.li1}
+            onPress={()=>{
+              // select this picture 
+              dispatch(selectImg(pic));
+              navigation.navigate('Album', {showPic: Math.random()});
+            }}
         >
           <Text style={styles.listItemText}>{pic.imageName}</Text>
         </TouchableOpacity>
+        
+        <View style={{flexDirection:'row', paddingTop:'3%'}}>
+          <TouchableOpacity 
+            style={styles.li2}
+            onPress={()=>{
+              // select this picture 
+              dispatch(selectImg(pic));
+              navigation.navigate('Album', {editPic: Math.random()});
+            }}  
+          >
+            <Text style={styles.listItemOptionText}>Edit</Text>
+          </TouchableOpacity>
 
-        <TouchableOpacity 
-          style={styles.li2}
-          onPress={()=>{
-            // select this picture 
-            dispatch(selectImg(pic));
-            navigation.navigate('Album', {editPic: Math.random()});
-          }}  
-        >
-          <Text style={styles.listItemOptionText}>Edit</Text>
-        </TouchableOpacity>
+          <TouchableOpacity 
+            style={styles.li2}
+            onPress={()=>{
+              shareImage(pic.path);
+            }}  
+          >
+            <Text style={styles.listItemOptionText}>Share</Text>
+          </TouchableOpacity>
 
-        <TouchableOpacity 
-          style={styles.li2}
-          onPress={()=>{
-            shareImage(pic.path);
-          }}  
-        >
-          <Text style={styles.listItemOptionText}>Share</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity 
-          style={styles.li2}
-          onPress={()=>{
-            deleteItem(pic);
-          }}  
-        >
-          <Text style={styles.listItemOptionText}>Delete</Text>
-        </TouchableOpacity>
+          <TouchableOpacity 
+            style={styles.li2}
+            onPress={()=>{
+              deleteItem(pic);
+            }}  
+          >
+            <Text style={styles.listItemOptionText}>Delete</Text>
+          </TouchableOpacity>
+        </View>
+        
       </View>
     );
   }
@@ -92,8 +95,8 @@ function ListPicItem(props) {
     listItemContainer: {
       width: '95%',
       justifyContent: 'flex-start',
-      alignItems: 'center',
-      flexDirection: 'row',
+      alignItems: 'start',
+      // flexDirection: 'row',
       paddingVertical: '5%',
       borderBlockColor:'gray',
       borderBottomWidth:1
@@ -115,7 +118,10 @@ function ListPicItem(props) {
     listItemOptionText: {
       fontFamily: 'PixelifySans', 
       fontSize:15, 
-      color:'white'
+      color:'white',
+      backgroundColor:'gray',
+      borderRadius: 8,
+      paddingHorizontal: '2%'
     }
   });
   
